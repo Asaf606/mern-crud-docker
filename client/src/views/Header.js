@@ -1,81 +1,69 @@
-import React, { Component } from 'react';
-import {LinkContainer} from 'react-router-bootstrap';
+import React, { Component } from "react";
+import { Link } from "react-router-dom";
 
-import {
-    Grid,
-    Row,
-    Col,
-    Navbar,
-    Nav,
-    NavItem,
-    NavDropdown,
-    MenuItem
-} from 'react-bootstrap';
-
-import {
-  NavLink,
-} from 'reactstrap';
-
-function CustomHeader(props) {
-
-    const navbarInstance = (
-        <Navbar inverse collapseOnSelect>
-
-          <Navbar.Header>
-            <Navbar.Brand>
-              <a href="/">MERN CRUD APP</a>
-            </Navbar.Brand>
-            <Navbar.Toggle />
-          </Navbar.Header>
-
-          <Navbar.Collapse>
-            <Nav>
-              <NavItem eventKey={1} href="#">
-                Link
-              </NavItem>
-              <NavItem eventKey={2} href="#">
-                Link
-              </NavItem>
-              <NavDropdown eventKey={3} title="Dropdown" id="basic-nav-dropdown">
-                <MenuItem eventKey={3.1}>Action</MenuItem>
-                <MenuItem eventKey={3.2}>Another action</MenuItem>
-                <MenuItem eventKey={3.3}>Something else here</MenuItem>
-                <MenuItem divider />
-                <MenuItem eventKey={3.3}>Separated link</MenuItem>
-              </NavDropdown>
-            </Nav>
-
-            <Nav pullRight>
-                <NavItem>
-                    <LinkContainer to='/add-item'>
-                      <NavLink>Add-Item</NavLink>
-                    </LinkContainer>
-                </NavItem>
-
-               <NavItem eventKey={1} href="#">
-                  Link Right
-               </NavItem>
-            </Nav>
-          </Navbar.Collapse>
-
-      </Navbar>
-    );
-
-    return (
-        navbarInstance
-    );
-}
-
+const styles = {
+  bar: {
+    background: "#ffffff",
+    borderBottom: "1px solid #eaeaea",
+    padding: "12px 24px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    position: "sticky",
+    top: 0,
+    zIndex: 10,
+  },
+  brand: {
+    fontWeight: 800,
+    letterSpacing: "0.5px",
+    color: "#0b5ed7",
+    textDecoration: "none",
+    fontSize: "18px",
+  },
+  right: { display: "flex", gap: "14px" },
+  link: {
+    textDecoration: "none",
+    color: "#111",
+    fontWeight: 600,
+    padding: "8px 12px",
+    borderRadius: "10px",
+  },
+  linkHover: {
+    background: "#f3f4f6",
+  },
+};
 
 class Header extends Component {
+  state = { hover: null };
 
-    render() {
-      return (
-        <div>
-            <CustomHeader />
+  renderLink(to, label, key) {
+    const isHover = this.state.hover === key;
+    return (
+      <Link
+        to={to}
+        style={{ ...styles.link, ...(isHover ? styles.linkHover : {}) }}
+        onMouseEnter={() => this.setState({ hover: key })}
+        onMouseLeave={() => this.setState({ hover: null })}
+      >
+        {label}
+      </Link>
+    );
+  }
+
+  render() {
+    return (
+      <div style={styles.bar}>
+        <a href="/" style={styles.brand}>
+          MERN CRUD APP
+        </a>
+
+        <div style={styles.right}>
+          {this.renderLink("/add-item", "Add Item", "add")}
+          {this.renderLink("/", "Home", "home")}
         </div>
-      );
-    }
+      </div>
+    );
+  }
 }
 
 export default Header;

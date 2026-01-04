@@ -6,17 +6,42 @@ var port = 4200;
 var cors = require('cors');
 
 
-//Mongoose connection with mongodb
+// Mongoose connection with mongodb
 mongoose.Promise = require('bluebird');
-mongoose.connect('mongodb://localhost:27017/CrudDB')
+
+const MONGO_URI = process.env.MONGO_URI || "mongodb://db:27017/appdb";
+
+const connectWithRetry = () => {
+  mongoose
+    .connect(MONGO_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      serverSelectionTimeoutMS: 5000, // daha tez fail etsin
+    })
     .then(() => {
-        console.log('Start');
+      console.log("MongoDB connected:", MONGO_URI);
     })
     .catch((err) => {
-        console.error('App starting error:', err.stack);
-        process.exit(1);
+      console.error("MongoDB connection failed, retrying in 2s...", err.message);
+      setTimeout(connectWithRetry, 2000);
     });
+};
 
+connectWithRetry();
+/*
+const connectWithRetry = () => {
+  mongoose
+    .connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+    .then(() => console.log("MongoDB connected"))
+    .catch((err) => {
+      console.error("MongoDB connection failed, retrying in 2s...", err.message);
+      setTimeout(connectWithRetry, 2000);
+    });
+};
+
+connectWithRetry();
+
+*/
 // Required aplication specific custom router module
 var itemRouter = require('./src/routes/itemRouter');
 
@@ -31,6 +56,8 @@ app.use(bodyParser.json());
 app.use('/items', itemRouter);
 
 // Start the server
-app.listen(port, function() {
-    console.log('Server is running on Port: ', port);
+const PORT = process.env.PORT || 4200;
+
+app.listen(PORT, "0.0.0.0", function () {
+  console.log("Server is running on Port: ", PORT);
 });
